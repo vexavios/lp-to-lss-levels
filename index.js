@@ -78,11 +78,7 @@ const convertAndSaveLevels = async () => {
 
       // all level stats
       const levelStats = page$("li.collection-item", "ul.level-stats");
-      let levelRating,
-        levelGame,
-        levelDifficulty,
-        levelDescription,
-        levelPostDate;
+      let levelRating, levelGame, levelDifficulty, levelDescription;
       const levelDescriptionPane = page$(
         "li.collection-item",
         "ul.level-description"
@@ -96,7 +92,10 @@ const convertAndSaveLevels = async () => {
         switch (page$(currentLevelStat).find("strong").text().trim()) {
           case "Rating:":
             page$(currentLevelStat).find("strong").remove();
-            levelRating = page$(currentLevelStat).text().trim();
+            levelRating =
+              parseFloat(
+                page$(currentLevelStat).text().trim().replace("%", "")
+              ) / 20.0;
             break;
           case "Game:":
             page$(currentLevelStat).find("strong").remove();
@@ -105,10 +104,6 @@ const convertAndSaveLevels = async () => {
           case "Difficulty:":
             page$(currentLevelStat).find("strong").remove();
             levelDifficulty = page$(currentLevelStat).text().trim();
-            break;
-          case "Published:":
-            page$(currentLevelStat).find("strong").remove();
-            levelPostDate = page$(currentLevelStat).text().trim();
             break;
           default:
         }
@@ -152,7 +147,7 @@ const convertAndSaveLevels = async () => {
         raters: [],
         commenters: [],
         rating: levelRating,
-        postDate: levelPostDate,
+        postDate: new Date(),
       };
       levels.push(levelObj);
 
