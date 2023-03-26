@@ -78,7 +78,12 @@ const convertAndSaveLevels = async () => {
 
       // all level stats
       const levelStats = page$("li.collection-item", "ul.level-stats");
-      let levelRating, levelGame, levelDifficulty, levelDescription;
+      let levelRating,
+        levelGame,
+        levelDifficulty,
+        levelThumbnail,
+        levelDescription,
+        levelContributors;
       const levelDescriptionPane = page$(
         "li.collection-item",
         "ul.level-description"
@@ -109,9 +114,21 @@ const convertAndSaveLevels = async () => {
         }
       }
 
-      // get level description
+      // get level description stats
       for (let j = 0; j < levelDescriptionPane.length; j++) {
         const currentDescriptionStat = levelDescriptionPane[j];
+
+        // get level thumbnail if one is present
+        if (
+          page$(currentDescriptionStat).find("div#level-images-slider")
+            .length !== 0
+        )
+          levelThumbnail = page$(currentDescriptionStat)
+            .find("div#level-images-slider")
+            .find("ul.slides")
+            .find("li")
+            .find("img")
+            .attr("src");
 
         // determine which stat we are looking at
         switch (page$(currentDescriptionStat).find("strong").text().trim()) {
@@ -119,6 +136,13 @@ const convertAndSaveLevels = async () => {
             page$(currentDescriptionStat).find("strong").first().remove();
             levelDescription = page$(currentDescriptionStat).html().trim();
             break;
+          case "Contributors:":
+            page$(currentDescriptionStat).find("strong").remove();
+            if (
+              page$(currentDescriptionStat).text().trim() !==
+              "No additional contributors."
+            )
+              levelContributors = page$(currentDescriptionStat).text().trim();
           default:
         }
       }
@@ -129,8 +153,12 @@ const convertAndSaveLevels = async () => {
         author: lssUserID,
         code: levelCode,
         description: levelDescription,
-        tags: [],
-        contributors: [],
+        tags: [""],
+        contributors: levelContributors
+          ? levelContributors
+              .split(",")
+              .map((contributor) => contributor.trim())
+          : [""],
         difficulty: levelDifficulty,
         game:
           levelGame === "Super Mario Construct"
@@ -140,7 +168,7 @@ const convertAndSaveLevels = async () => {
             : levelGame === "Super Mario 127"
             ? 2
             : -1,
-        thumbnail: "",
+        thumbnail: levelThumbnail ? levelThumbnail : "",
         status: "Public",
         plays: [],
         rates: [],
