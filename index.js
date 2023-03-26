@@ -167,7 +167,7 @@ const convertAndSaveLevels = async () => {
             ? 1
             : levelGame === "Super Mario 127"
             ? 2
-            : -1,
+            : 3,
         thumbnail: levelThumbnail ? levelThumbnail : "",
         status: "Public",
         plays: [],
