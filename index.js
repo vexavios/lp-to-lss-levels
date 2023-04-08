@@ -3,7 +3,7 @@ const cheerio = require("cheerio");
 const fs = require("fs");
 
 // how long to wait between requests and actions (in milliseconds)
-const WAIT_TIME_MS = 15000;
+const WAIT_TIME_MS = 1000;
 
 /**
  * Download, convert, and save all Level Palace (LP) levels
@@ -36,7 +36,7 @@ const convertAndSaveLevels = async () => {
     `Beginning conversion process of levels for user "${lpUsername}"...`
   );
   while (hasNextPage) {
-    sleep(WAIT_TIME_MS);
+    await sleep(WAIT_TIME_MS);
 
     const response = await axios.get(`${baseURL}&page=${currentPage}`, {
       headers: { "User-Agent": "lp-helper" },
@@ -54,7 +54,7 @@ const convertAndSaveLevels = async () => {
 
     // iterate through all levels on page
     for (let i = 0; i < levelCards.length; i++) {
-      sleep(WAIT_TIME_MS);
+      await sleep(WAIT_TIME_MS);
 
       const currentLevelCard = levelCards[i];
       const levelLink =
@@ -175,7 +175,7 @@ const convertAndSaveLevels = async () => {
         raters: [],
         commenters: [],
         rating: levelRating,
-        postDate: new Date(),
+        postDate: null,
       };
       levels.push(levelObj);
 
@@ -213,18 +213,25 @@ const convertAndSaveLevels = async () => {
 
   // iterate through all levels
   console.log("Saving levels as JSON for LSS...");
-  levels.forEach((level, index) => {
+  let levelNum = 1;
+  for (let i = levels.length - 1; i >= 0; i--) {
+    await sleep(10);
+    const level = levels[i];
+    level.postDate = new Date();
     const levelJsonData = JSON.stringify(level, null, 2);
 
     if (!fs.existsSync(`./${lpUsername}`)) fs.mkdirSync(`./${lpUsername}`);
 
     try {
-      fs.writeFileSync(`${lpUsername}/level-${index + 1}.json`, levelJsonData);
+      fs.writeFileSync(`${lpUsername}/level-${levelNum}.json`, levelJsonData);
       console.log(`Successfully saved level with name "${level.name}".`);
     } catch (error) {
       console.error(error);
     }
-  });
+
+    levelNum++;
+  }
+
   console.log("Finished saving levels!");
   console.log(
     `All levels for user "${lpUsername}" have successfully been converted and saved!`
