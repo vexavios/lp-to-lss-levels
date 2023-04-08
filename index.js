@@ -26,7 +26,9 @@ const convertAndSaveLevels = async () => {
   const lssUserID = process.argv[3];
 
   // variables
-  const baseURL = `https://www.levelpalace.com/levels?creator=${lpUsername}&level_class=All&sort=newest&difficulty=all`;
+  const baseURL = `https://www.levelpalace.com/levels?creator=${encodeURIComponent(
+    lpUsername
+  )}&level_class=All&sort=newest&difficulty=all`;
   const levels = [];
   let currentPage = 1;
   let hasNextPage = true;
