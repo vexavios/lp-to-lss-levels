@@ -1,5 +1,6 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
+const https = require('https');
 const fs = require("fs");
 
 // how long to wait between requests and actions (in milliseconds)
@@ -42,6 +43,7 @@ const convertAndSaveLevels = async () => {
 
 		const response = await axios.get(`${baseURL}&page=${currentPage}`, {
 			headers: { "User-Agent": "lp-helper" },
+			httpsAgent: new https.Agent({ rejectUnauthorized: false }),
 		});
 		const $ = cheerio.load(response.data);
 		console.log(`Searching page ${currentPage} of LP levels...`);
@@ -68,6 +70,7 @@ const convertAndSaveLevels = async () => {
 			// go to level page via link in card
 			const pageResponse = await axios.get(levelLink, {
 				headers: { "User-Agent": "lp-helper" },
+				httpsAgent: new https.Agent({ rejectUnauthorized: false }),
 			});
 			const page$ = cheerio.load(pageResponse.data);
 

@@ -127,3 +127,4 @@ dist
 .pnp.*
 
 import-level-folder.bat
+import-level-folder.sh
